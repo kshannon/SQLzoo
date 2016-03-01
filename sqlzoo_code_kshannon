@@ -1,0 +1,175 @@
+/*
+Kyle SHannon SQLZOO Code - Jan 2016
+*/
+
+
+#################### --------SELECT basics-------- ####################
+/*
+name	continent	area	population	gdp
+Afghanistan	Asia	652230	25500100	20343000000
+Albania	Europe	28748	2831741	12960000000
+Algeria	Africa	2381741	37100000	188681000000
+Andorra	Europe	468	78115	3712000000
+Angola	Africa	1246700	20609294	100990000000
+....
+*/
+
+/* 1.  The example uses a WHERE clause to show the population of 'France'. Note
+that strings (pieces of text that are data) should be in 'single quotes'; Modify
+it to show the population of Germany*/
+
+SELECT population FROM world
+  WHERE name = 'Germany'
+
+/* 2.  The query shows the name and population density for each country where
+the area is over 5,000,000 km2. Population density is not a column in the World
+table, but we can calculate it as population/area. Modify it to show the name
+and per capita gdp: gdp/population for each country where the area is over
+5,000,000 km2*/
+
+SELECT name, gdp/population FROM world
+  WHERE area > 5000000
+
+/* 3.  Checking a list The word IN allows us to check if an item is in a list.
+The example shows the name and population for the countries 'Luxembourg',
+'Mauritius' and 'Samoa'.
+Show the name and the population for 'Ireland', 'Iceland' and 'Denmark'.*/
+
+SELECT name, population FROM world
+  WHERE name IN ('Ireland', 'Iceland', 'Denmark');
+
+/* 4. Which countries are not too small and not too big? BETWEEN allows range
+checking (range specified is inclusive of boundary values). The example below
+shows countries with an area of 250,000-300,000 sq. km. Modify it to show the
+country and the area for countries with an area between 200,000 and 250,000.*/
+
+SELECT name, area FROM world
+  WHERE area BETWEEN 200000 AND 250000;
+
+################## --------SELECT from WORLD Tutorial-------- ##################
+
+/* 1. Read the notes about this table. Observe the result of running a simple
+SQL command.*/
+
+SELECT name, continent, population FROM world
+
+/* 2. How to use WHERE to filter records. Show the name for the countries that
+have a population of at least 200 million. 200 million is 200000000, there are
+eight zeros.*/
+
+SELECT name FROM world
+WHERE population >= 200000000
+
+/* 3. Give the name and the per capita GDP for those countries with a population
+of at least 200 million.*/
+
+SELECT name, gdp/population AS 'per capita GDP'
+FROM world
+WHERE population >= 200000000;
+
+/* 4. Show the name and population in millions for the countries of the
+continent 'South America'. Divide the population by 1000000 to get population in
+millions.*/
+
+SELECT name, population/1000000 AS pop_in_millions
+FROM world
+WHERE continent = 'South America';
+
+/* 5. Show the name and population for France, Germany, Italy*/
+
+SELECT name, population
+FROM world
+WHERE name IN ('France', 'Germany', 'Italy');
+
+/* 6. Show the countries which have a name that includes the word 'United'*/
+
+SELECT name
+FROM world
+WHERE name LIKE '%United%';
+
+/* 7. Two ways to be big: A country is big if it has an area of more than 3
+million sq km or it has a population of more than 250 million. Show the
+countries that are big by area or big by population. Show name, population and
+area.*/
+
+SELECT name, population, area
+FROM world
+WHERE area > 3000000
+OR population > 250000000;
+
+/* 8. USA, India, and China are big in population and big by area. Exclude these
+countries. Show the countries that are big by area or big by population but not
+both. Show name, population and area*/
+
+SELECT name, population, area
+FROM world
+WHERE (area > 3000000 OR population > 250000000)
+AND NOT (area > 3000000 AND population > 250000000);
+
+/* 9. Show the name and population in millions and the GDP in billions for the
+countries of the continent 'South America'. Use the ROUND function to show the
+values to two decimal places. For South America show population in millions and
+GDP in billions to 2 decimal places.*/
+
+SELECT 
+   name, 
+   ROUND(population/1000000,2) AS pop_in_millions, 
+   ROUND(gdp/1000000000,2) AS gdp_in_billions
+FROM world
+WHERE continent = 'South America'
+
+/* 10. Show the per-capita GDP for those countries with a GDP of at least one
+trillion (1000000000000; that is 12 zeros). Round this value to the nearest
+1000. Show per-capita GDP for the trillion dollar countries to the nearest
+$1000.*/
+
+SELECT
+   name AS "trillion_doller_countries",
+   ROUND(gdp/population,-3) AS "per_capita_gdp"
+FROM world
+WHERE gdp >= 1000000000000;
+
+/* 11. The CASE statement shown is used to substitute North America for
+Caribbean in the third column. Show the name - but substitute Australasia for
+Oceania - for countries beginning with N.*/
+
+SELECT name,
+CASE
+	WHEN continent='Oceania' THEN 'Australasia'
+        ELSE continent END
+FROM world
+WHERE name LIKE 'N%'
+
+/* 12. Show the name and the continent - but substitute Eurasia for Europe and
+Asia; substitute America - for each country in North America or South America or
+Caribbean. Show countries beginning with A or B*/
+
+SELECT name,
+CASE 
+	WHEN continent in ('Europe', 'Asia') 
+     	THEN 'Eurasia'
+    WHEN continent in ('North America', 'South America', 'Caribbean') 
+        THEN 'America'
+    ELSE continent END AS continent
+FROM world
+WHERE
+     name LIKE 'a%' OR name LIKE 'b%'
+
+/* 13. Put the continents right... Oceania becomes Australasia Countries in
+Eurasia and Turkey go to Europe/Asia Caribbean islands starting with 'B' go to
+North America, other Caribbean islands go to South America Show the name, the
+original continent and the new continent of all countries.*/
+
+SELECT name, continent,
+CASE 
+   WHEN continent='Oceania' THEN 'Australasia'
+   WHEN continent='Eurasia' OR name='Turkey' THEN 'Europe/Asia'
+   WHEN continent='Caribbean' AND name LIKE 'B%' THEN 'North America'   
+   WHEN continent='Caribbean' THEN 'South America'   
+   ELSE continent END AS revised_continent
+   
+FROM world
+ORDER BY name --no idea why this is needed, grader must be broken...
+
+
+################## --------SELECT from Nobel Tutorial-------- ##################
