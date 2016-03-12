@@ -354,16 +354,99 @@ WHERE gdp > ALL (SELECT gdp
                  FROM world
                  WHERE continent = 'europe' AND gdp > 0)
 
-/* 7.  */ 
+/* 7. Find the largest country (by area) in each continent, show the continent,
+the name and the area: */ 
+
+SELECT continent, name, area 
+FROM world x
+WHERE area >= ALL
+    (SELECT MAX(area)
+     FROM world y
+     WHERE y.continent=x.continent AND population>0)
+     --comparing 1 : 1 here
+
+/* 8. List each continent and the name of the country that comes first 
+alphabetically. */ 
+
+SELECT continent, name
+FROM world x
+WHERE name =
+     (SELECT name
+      FROM world y
+      WHERE y.continent = x.continent
+      ORDER BY name
+      LIMIT 1)
+
+/* 9. Find the continents where all countries have a population <= 25000000. 
+Then find the names of the countries associated with these continents. Show 
+name, continent and population. */ 
+
+SELECT name, continent, population
+FROM world
+WHERE continent NOT IN
+      (SELECT DISTINCT continent 
+       FROM world
+       WHERE population >= 25000000)
+
+/* 10. Some countries have populations more than three times that of any of 
+their neighbours (in the same continent). Give the countries and continents. */ 
+
+SELECT name, continent
+FROM world x
+WHERE population > ALL
+      (SELECT population * 3
+       FROM world y
+       WHERE y.continent = x.continent AND y.name <> x.name)
+      --includes <> name because if you do not have this then it will 3* its own
+      --thus leaving you with no results cause each country will always battle
+      --itself at 3 * its population.
+
+################### --------SUM and COUNT Tutorial-------- #####################
+
+/* 1. Show the total population of the world. */
+
+SELECT SUM(population) AS 'world pop.'
+FROM world
+
+/* 2. List all the continents - just once each. */
+
+SELECT DISTINCT continent
+FROM world
+
+/* 3. Give the total GDP of Africa */
+
+SELECT SUM(gdp) AS gdp_total
+FROM world
+WHERE continent = 'africa'
+
+/* 4.  */
 
 
 
-/* 8.  */ 
+/* 5.  */
 
 
 
-/* 9.  */ 
+/* 6.  */
 
 
 
-/* 10.  */ 
+/* 7.  */
+
+
+
+/* 8.  */
+
+
+
+
+
+
+
+
+
+
+
+
+
+
