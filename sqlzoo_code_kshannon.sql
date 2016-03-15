@@ -419,24 +419,39 @@ SELECT SUM(gdp) AS gdp_total
 FROM world
 WHERE continent = 'africa'
 
-/* 4.  */
+/* 4. How many countries have an area of at least 1000000 */
 
+SELECT COUNT(name)
+FROM world
+WHERE area >= 1000000
 
+/* 5. What is the total population of ('France','Germany','Spain') */
 
-/* 5.  */
+SELECT SUM(population) AS pop_total
+FROM world
+WHERE name IN ('France','Germany','Spain')
 
+/* 6. For each continent show the continent and number of countries */
 
+SELECT continent, COUNT(name)
+FROM world
+GROUP BY continent
 
-/* 6.  */
+/* 7. For each continent show the continent and number of countries with 
+populations of at least 10 million. */
 
+SELECT continent, COUNT(continent) AS number
+FROM world
+WHERE population >= 10000000
+GROUP BY continent
 
+/* 8. List the continents that have a total population of at least 
+100 million. */
 
-/* 7.  */
-
-
-
-/* 8.  */
-
+SELECT continent
+FROM world
+GROUP BY continent
+HAVING SUM(population) >= 100000000
 
 
 
