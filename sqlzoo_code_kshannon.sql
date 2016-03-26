@@ -943,6 +943,55 @@ WHERE
 137 ('Haymarket' and 'Leith') */
 
 
-/* 8.  */
-/* 9.  */
-/* 10.  */
+/* 8. Give a list of the services which connect the stops 'Craiglockhart' 
+and 'Tollcross' */
+
+SELECT 
+   DISTINCT r1.company, r1.num
+FROM 
+    route r1
+    JOIN route r2 ON ( r1.num=r2.num AND r1.company=r2.company)
+    JOIN stops s1 ON (r1.stop=s1.id)
+    JOIN stops s2 ON (r2.stop=s2.id)
+WHERE
+    s1.name = 'tollcross' AND s2.name = 'Craiglockhart'
+    
+
+/* 9. Give a distinct list of the stops which may be reached from 
+'Craiglockhart' by taking one bus, including 'Craiglockhart' itself, offered 
+by the LRT company. Include the company and bus no. of the relevant services. */
+
+SELECT 
+    DISTINCT s1.name, r1.company, r1.num
+FROM
+    route r1
+    JOIN route r2 ON (r1.company=r2.company AND r1.num=r2.num)
+    JOIN stops s1 ON (r1.stop=s1.id)
+
+WHERE
+    r1.company='LRT' AND r1.num IN (
+                                    SELECT num
+                                    FROM route JOIN stops ON (route.stop=stops.id)
+                                    WHERE stops.name = 'Craiglockhart')  
+ORDER BY r1.num
+
+
+/* 10. Find the routes involving two buses that can go from Craiglockhart to 
+Sighthill. Show the bus no. and company for the first bus, the name of the stop 
+for the transfer, and the bus no. and company for the second bus. */
+
+SELECT 
+   DISTINCT r1.num, r1.company, s2.name ,  r3.num,  r3.company
+FROM 
+    route r1 
+    JOIN route r2 ON (r1.company = r2.company AND r1.num = r2.num)
+    JOIN ( route r3 JOIN route r4 ON (r3.company = r4.company AND r3.num= r4.num))
+    JOIN stops s1 ON (r1.stop = s1.id)
+    JOIN stops s2 ON (r2.stop = s2.id)
+    JOIN stops s3 ON (r3.stop = s3.id)
+    JOIN stops s4 ON (r4.stop = s4.id)
+WHERE  
+    s1.name = 'Craiglockhart' 
+    AND s4.name = 'Sighthill'
+    AND  s2.name = s3.name
+ORDER BY LENGTH(r1.num), r2.num, s2.id, LENGTH(r3.num), r4.num
